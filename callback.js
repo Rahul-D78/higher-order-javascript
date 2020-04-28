@@ -7,28 +7,37 @@
 
 function download(url, downloaded) {
   console.log(`Downloading from ${url}`);
+  if(!url.startsWith('http')) {
+    return  downloaded(new Error('url must start with http'));
+    }
   setTimeout(() => {
-    let savedFile = url.split('/').pop();  
+    let savedFile = url.split('/').pop()  
     console.log(`Download Over and saved as ${savedFile}`);
-    downloaded(savedFile);
+    downloaded(null, savedFile);
   },3000)
 }
 
-function compress(filepath, format, compressed) {
- console.log(`compressing ${filepath}`);
+function compress(file, format, compressed) {
+ console.log(`compressing ${file}`);
+ if(['zip', 'gzip', '7z'].indexOf(format) === -1) {
+    return compressed(new Error('we only suppor Zip, gzip, 7z'));
+  }
     setTimeout(() => {
-        let archieve = filepath.split('.')[0] + '.' + format
+        let archieve = file.split('.')[0] + '.' + format
         console.log(`compressed and sved as ${archieve}`);
-        compressed(archieve);
-    },2000)
+        compressed(null,archieve);
+    },3000)
 }
 
 function upload(server , file, uploaded) {
     console.log(`uploding ${file} to ${server}`);
+    if(!server.startsWith('ftp://')) {
+      return uploaded(new Error('we can only upload to ftp servers'));
+      }
     setTimeout(() => {
-        let remotepath = `${server} / ${file}` ;
+        let remotepath = `${server}/${file}` ;
         console.log(`uploaded to server ${remotepath}`);
-        uploaded(remotepath);
+        uploaded(null, remotepath);
     },1000)
 }
 
@@ -37,10 +46,15 @@ function upload(server , file, uploaded) {
 //     console.log('done');
 // },3000);
 // console.log('end');
-download('http://sitepath/path/image.jpg', (file) => {
-    compress(file, 'zip', (archieve) => {
-        upload('http://filepath', archieve ,()=>{
-
+download('http://sitepath/path/image.jpg', (err,file) => {
+    if(err) throw err
+    compress(file, 'zip', (err, archieve) => {
+        if(err){
+            console.warn(err)
+            archieve = err
+        }
+        upload('ftp://file.com', archieve ,(err)=>{
+        if(err) throw err
         })
     })
 });
