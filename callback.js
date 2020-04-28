@@ -5,26 +5,30 @@
  * compress it and upload it somewhere else. 
  */
 
-function download(url) {
-  console.log(`Downloaded from ${url}`);
+function download(url, downloaded) {
+  console.log(`Downloading from ${url}`);
   setTimeout(() => {
-    console.log(`Download Over and saved as ${url.split('/').pop()}`);
+    let savedFile = url.split('/').pop();  
+    console.log(`Download Over and saved as ${savedFile}`);
+    downloaded(savedFile);
   },3000)
 }
 
-function compress(filepath, format) {
+function compress(filepath, format, compressed) {
  console.log(`compressing ${filepath}`);
     setTimeout(() => {
-        console.log(`compressed and sved as ${filepath.split('.')[0] + '.' + format}`);
-        
+        let archieve = filepath.split('.')[0] + '.' + format
+        console.log(`compressed and sved as ${archieve}`);
+        compressed(archieve);
     },2000)
 }
 
-function upload(server , file) {
+function upload(server , file, uploaded) {
     console.log(`uploding ${file} to ${server}`);
     setTimeout(() => {
-        console.log(`uploading completed to server ${server}/${file}`);
-        
+        let remotepath = `${server} / ${file}` ;
+        console.log(`uploaded to server ${remotepath}`);
+        uploaded(remotepath);
     },1000)
 }
 
@@ -33,6 +37,10 @@ function upload(server , file) {
 //     console.log('done');
 // },3000);
 // console.log('end');
-download('http://sitepath/path/image.jpg');
-compress('myfile.png', 'zip');
-upload('localhost:3000' , 'myfile.zip');
+download('http://sitepath/path/image.jpg', (file) => {
+    compress(file, 'zip', (archieve) => {
+        upload('http://filepath', archieve ,()=>{
+
+        })
+    })
+});
